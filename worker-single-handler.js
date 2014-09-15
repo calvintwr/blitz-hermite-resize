@@ -1,4 +1,4 @@
-function resample_hermite(canvas, W, H, W2, H2, callback){
+function resample_hermite(canvas, W, H, W2, H2, workerPath, callback){
 
 	if(typeof callback !== 'function') {
 		console.log('Error: Expecting callback to be a function!');
@@ -12,7 +12,7 @@ function resample_hermite(canvas, W, H, W2, H2, callback){
     //var cpu_in_use = 0;
     canvas.getContext("2d").clearRect(0, 0, W, H);
 
-    var my_worker = new Worker("assets/js/worker-hermite.js");
+    var my_worker = new Worker(workerPath);
     my_worker.onmessage = function(event){
 
         img2 = event.data.data;    

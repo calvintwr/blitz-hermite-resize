@@ -1,15 +1,30 @@
 Hermite-resize
 ==============
 
-From the original Hermite-resize, a single work is spawned to do the resizing calculation.
+From the original Hermite-resize, modifications were made to spanw a single worker to do the resizing calculation. As documented by the original author, anything more than 2 workers slows down the calculation as combining the data takes up alot of processing power.
 
-This frees up the main UI thread and prevent the browser from freezing when the resizing is ongoing.
+Spawning workers frees up the main thread and prevent the browser from freezing when the resizing is ongoing.
 
 Additionally, a performance increase of up to 20% is noticeable.
 
 Also added a callback handler to allow asynchronous callback when the worker thread completes the resizing.
 
 Use worker-single-handler.js and worker-single-hermite.js.
+
+Use
+==============
+
+resample_hermite(canvas, W, H, W2, H2, workerPath, callback)
+
+canvas: a canvas with your image drawn on it.
+
+W, H: source width/heights.
+
+W2, H2: destination width/heights.
+
+workerPath: the path to your worker-single-hermite.js
+
+callback: [function]
 
 Original Text
 ==============
