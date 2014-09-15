@@ -1,6 +1,19 @@
 Hermite-resize
 ==============
 
+From the original Hermite-resize, a single work is spawned to do the resizing calculation.
+
+This frees up the main UI thread and prevent the browser from freezing when the resizing is ongoing.
+
+Additionally, a performance increase of up to 20% is noticeable.
+
+Also added a callback handler to allow asynchronous callback when the worker thread completes the resizing.
+
+Use worker-single-handler.js and worker-single-hermite.js.
+
+Original Text
+==============
+
 Fast image resize/resample using Hermite filter with JavaScript.
 
 demo: http://viliusle.github.io/miniPaint/
