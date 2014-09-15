@@ -1,7 +1,7 @@
 Hermite-resize
 ==============
 
-From the original Hermite-resize, modifications were made to spanw a single worker to do the resizing calculation. As documented by the original author, anything more than 2 workers slows down the calculation as combining the data takes up alot of processing power.
+From the original Hermite-resize, modifications were made to spawn a single worker to do the resizing calculation. As documented by the original author, anything more than 2 workers slows down the calculation as combining the data takes up alot of processing power.
 
 Spawning workers frees up the main thread and prevent the browser from freezing when the resizing is ongoing.
 
