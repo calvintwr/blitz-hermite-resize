@@ -1,42 +1,31 @@
 Hermite-resize
 ==============
 
-From the original Hermite-resize, modifications were made to spawn a single worker to do the resizing calculation. As documented by the original author, anything more than 2 workers slows down the calculation as combining the data takes up alot of processing power.
+From the original Hermite-resize, modifications were made to spawn a single worker to do the resizing calculation. As documented by the original author, anything more than 2 workers slows down resizing as combining the data takes time.
 
-Spawning workers frees up the main thread and prevent the browser from freezing when the resizing is ongoing.
+Spawning workers frees up the main thread and prevent the browser from freezing when the resizing is ongoing. Additionally, a performance increase of up to 20% is noticeable.
 
-Additionally, a performance increase of up to 20% is noticeable.
+Major refactoring to make it more user friendly.
 
-Also added a callback handler to allow asynchronous callback when the worker thread completes the resizing.
-
-Use worker-single-handler.js and worker-single-hermite.js.
 
 Use
 ==============
 
-resample_hermite(canvas, W, H, W2, H2, workerPath, callback)
+```html
 
-canvas: a canvas with your image drawn on it.
+<script src="hermite.js"></script>
 
-W, H: source width/heights.
+//specify the path of the worker file. Path is relative to your HTML document and NOT the script path
+var h = Hermite.init('hermite-worker.js')
 
-W2, H2: destination width/heights.
+h.resize({
+    source: $('.image'), // any canvas or image elements, jQuery or native
+    width: 400,
+    height: 600,
+    output: 'image', // [optional] `image` or `canvas`. If not entered output is same as input element.
+    quality: 0.7, // [optional] applicable for `image` output only
+}, function(output) {
+    //your callback
+});
 
-workerPath: the path to your worker-single-hermite.js
-
-callback: [function]
-
-Original Text
-==============
-
-Fast image resize/resample using Hermite filter with JavaScript.
-
-demo: http://viliusle.github.io/miniPaint/
-### Single core:
-<b>hermite.js</b> - main function, fastest way.
-
-### Multi-core*:
-<b>worker-handler.js</b> - function that splits image, sends each peace to resize and combines results<br />
-<b>worker-hermite.js</b> - worker, must be in same domain
-
-* slower than single core, because sharing resources, combining takes additional time. And there are no ways to get CPU count with JS.
+```
