@@ -1,6 +1,12 @@
 Hermite-resize
 ==============
 
+Fast, simple, non-blocking and client-side Javascript image resizer.
+
+
+Introduction
+==============
+
 From the original Hermite-resize, modifications were made to spawn a single worker to do the resizing calculation. As documented by the original author, anything more than 2 workers slows down resizing as combining the data takes time.
 
 Spawning workers frees up the main thread and prevent the browser from freezing when the resizing is ongoing. Additionally, a performance increase of up to 20% is noticeable.
