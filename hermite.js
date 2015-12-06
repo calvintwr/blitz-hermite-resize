@@ -35,8 +35,8 @@ var Hermite = {
 
         var originalWidth = canvas.width;
         var originalHeight = canvas.height;
-        var resizeToWidth = obj.width;
-        var resizeToHeight = obj.height;
+        var resizeToWidth = Math.round(obj.width);
+        var resizeToHeight = Math.round(obj.height);
 
         var original = canvas.getContext('2d').getImageData(0, 0, originalWidth, originalHeight);
         var resizedImage = canvas.getContext('2d').getImageData(0, 0, resizeToWidth, resizeToHeight);
