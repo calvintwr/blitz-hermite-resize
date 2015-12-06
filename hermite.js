@@ -121,5 +121,5 @@ var Hermite = {
 
         throw new Error('#_mimeConverter fell through all cases!');
     }
-}
+};
 
