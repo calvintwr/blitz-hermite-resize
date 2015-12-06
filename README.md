@@ -1,7 +1,7 @@
 Hermite-resize
 ==============
 
-Fast, simple, non-blocking and client-side Javascript image resizer.
+Fast, simple, and non-blocking client-side Javascript image resizer.
 
 
 Introduction
