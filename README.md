@@ -16,10 +16,10 @@ Use
 <script src="hermite.js"></script>
 
 //specify the path of the worker file. Path is relative to your HTML document and NOT the script path
-var h = Hermite.init('hermite-worker.js')
+var h = Hermite.init('hermite-worker.js');
 
 h.resize({
-    source: $('.image'), // any canvas or image elements, jQuery or native
+    source: document.getElementById('image'), // any canvas or image elements, jQuery or native
     width: 400,
     height: 600,
     output: 'image', // [optional] `image` or `canvas`. If not entered output is same as input element.
