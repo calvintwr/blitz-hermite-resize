@@ -41,7 +41,7 @@ Precipitously cut image upload time and server loads by doing client-side image 
 
 
 ## Full options
-
+```js
 blitz({
     source: DOM Image/DOM Canvas/jQuery/DataURL/FileReader Event,
     width: 400,
@@ -59,3 +59,4 @@ blitz({
     // if you want to know how fast blitz resize       
     logPerformance: true/false
 })
+```
