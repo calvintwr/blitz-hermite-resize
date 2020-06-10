@@ -1,37 +1,61 @@
-Hermite-resize
-==============
+# Blitz
 
-Fast, simple, and non-blocking client-side Javascript image resizer.
+Fast, non-blocking, promise-styled client-side image resize/resample using Hermite filter with JavaScript.
 
-
-Introduction
-==============
-
-From the original Hermite-resize, modifications were made to spawn a single worker to do the resizing calculation. As documented by the original author, anything more than 2 workers slows down resizing as combining the data takes time.
-
-Spawning workers frees up the main thread and prevent the browser from freezing when the resizing is ongoing. Additionally, a performance increase of up to 20% is noticeable.
-
-Major refactoring to make it more user friendly.
-
-
-Use
-==============
-
-```html
-
-<script src="hermite.js"></script>
-
-//specify the path of the worker file. Path is relative to your HTML document and NOT the script path
-var h = Hermite.init('hermite-worker.js');
-
-h.resize({
-    source: document.getElementById('image'), // any canvas or image elements, jQuery or native
-    width: 400,
-    height: 600,
-    output: 'image', // [optional] `image` or `canvas`. If not entered output is same as input element.
-    quality: 0.7, // [optional] applicable for `image` output only
-}, function(output) {
-    //your callback
-});
+## Installation
 
 ```
+npm install blitz-resize --save
+```
+
+## Usage
+
+```js
+const blitz = Blitz.create()
+
+/* Promise */
+blitz({
+    source: DOM Image/DOM Canvas/jQuery/DataURL/FileReader Event,
+    width: 400,
+    height: 600
+}).then(output => {
+    // handle output
+})catch(error => {
+    // handle error
+})
+
+/* Await */
+let resized = await blizt({...})
+
+/* Old school callback */
+const blitz = Blitz.create('callback')
+blitz({...}, function(output) {
+    // run your callback.
+})
+
+```
+
+## Why use Blitz
+
+Precipitously cut image upload time and server loads by doing client-side image resizing. Blitz is non-blocking so you will not experience UI freeze when it is resizing.
+
+
+## Full options
+
+blitz({
+    source: DOM Image/DOM Canvas/jQuery/DataURL/FileReader Event,
+    width: 400,
+    height: 600,
+
+    // [optional] jpg, gif, png or raw. when not defined, assumes png.
+    outputFormat: 'jpg',
+
+    // [optional] `data`, `image` or `canvas`. If not entered output is same as input format.
+    output: 'data',  
+
+    // [optional] applicable for `image` or `data` output only
+    quality: 0.7,
+
+    // if you want to know how fast blitz resize       
+    logPerformance: true/false
+})

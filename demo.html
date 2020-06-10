@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="./dist/blitz.js"></script>
+</head>
+
+<body>
+    <input type="file" capture="camera" accept="image/*" id="cameraInput" name="cameraInput">
+    <h1>File input test</h1>
+    <div>
+        <p>File to Data: </p>
+        <textarea style="height: 400px; width: 400px;" id="dataOutput"></textarea>
+    </div>
+    <div>
+        <p>Image to Canvas:</p>
+        <div id="canvasOutput"></div>
+    </div>
+    <div>
+        <p>Data to Image:</p>
+        <div id="imageOutput"></div>
+    <div>
+    <div>
+        <p>Canvas to Image:</p>
+        <div id="canvasToImageOutput"></div>
+    </div>
+
+    <script>
+
+        function readFile(file) {
+            var reader = new FileReader();
+            reader.onload = readSuccess;
+
+            function readSuccess(evt) {
+
+                // file to data
+                var b1 = Blitz.create()
+                b1({
+                    source: evt,         // any canvas or image elements (jQuery or native), or event from FileReader
+                    width: 400,
+                    height: 600,
+                    outputFormat: 'jpg', // [optional] jpg, gif, png or raw. when not defined, assumes png.
+                    output: 'data',      // [optional] `image` or `canvas`. If not entered output is same as input element.
+                    quality: 0.7,        // [optional] applicable for `image` or `data` output only
+                    logPerformance: true
+                }).then(output => {
+                    console.log('Resize using event successful')
+                    document.getElementById("dataOutput").innerHTML = output
+                }).catch(err => {
+                    console.log(err)
+                })
+
+                // image -> canvas
+                var img = new Image()
+                img.src = evt.target.result
+                var b2 = Object.create(Blitz)
+                img.onload = function() {
+                    b2.resize({
+                        source: img,         // any canvas or image elements (jQuery or native), or event from FileReader
+                        width: 400,
+                        height: 600,
+                        outputFormat: 'jpg', // [optional] jpg, gif, png or raw. when not defined, assumes png.
+                        output: 'canvas',      // [optional] `image` or `canvas`. If not entered output is same as input element.
+                        quality: 0.7,        // [optional] applicable for `image` or `data` output only
+                        logPerformance: true
+                    }, function(output) {
+                        console.log('Resize using img to canvas successful')
+                        document.getElementById("canvasOutput").append(output)
+                    })
+                }
+
+                // data -> image
+                var b3 = Object.create(Blitz)
+                b3.resize({
+                    source: evt.target.result,         // any canvas or image elements (jQuery or native), or event from FileReader
+                    width: 400,
+                    height: 600,
+                    outputFormat: 'jpg', // [optional] jpg, gif, png or raw. when not defined, assumes png.
+                    output: 'image',      // [optional] `image` or `canvas`. If not entered output is same as input element.
+                    quality: 0.7,        // [optional] applicable for `image` or `data` output only
+                    logPerformance: true
+                }, function(output) {
+                    console.log('Resize using data successful')
+                    document.getElementById("imageOutput").append(output)
+                })
+
+
+                // canvas -> image
+                var img2 = new Image()
+                img2.src = evt.target.result
+                var b4 = Object.create(Blitz)
+
+                img2.onload = function() {
+
+                    var canvas = b4._imageToCanvas(img2)
+
+                    b4.resize({
+                        source: canvas,         // any canvas or image elements (jQuery or native), or event from FileReader
+                        width: 400,
+                        height: 600,
+                        outputFormat: 'jpg', // [optional] jpg, gif, png or raw. when not defined, assumes png.
+                        output: 'image',      // [optional] `image` or `canvas`. If not entered output is same as input element.
+                        quality: 0.7,        // [optional] applicable for `image` or `data` output only
+                        logPerformance: true
+                    }, function(output) {
+                        console.log('Resize using canvas successful')
+                        document.getElementById("canvasToImageOutput").append(output)
+                    })
+                }
+
+
+            };
+            reader.readAsDataURL(file);
+        }
+
+        document.getElementById('cameraInput').onchange = function(e) {
+            readFile(e.srcElement.files[0]);
+        };
+    </script>
+</body>
+
+</html>

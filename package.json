@@ -1,0 +1,44 @@
+{
+  "name": "blitz-resize",
+  "version": "0.3.0",
+  "description": "Fast, non-blocking, promise-styled client-side image resize/resample using Hermite filter with JavaScript.",
+  "main": "index.js",
+  "browser": "dist/blitz.min.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "browserify": "browserify src/blitz.js > dist/blitz.js --standalone Blitz --global-transform [ babelify --configFile ./.dist.babelrc ]",
+    "browserify:minify": "browserify src/blitz.js > dist/blitz.min.js --standalone Blitz --global-transform [ babelify --configFile ./.dist.babelrc ] -p tinyify",
+    "build": "npm run browserify && npm run browserify:minify"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/calvintwr/blitz-hermite-resize.git"
+  },
+  "keywords": [
+    "resize",
+    "image",
+    "compression",
+    "imageresizer",
+    "imagemagick",
+    "graphicsmagick"
+  ],
+  "author": "calvintwr",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/calvintwr/blitz-hermite-resize/issues"
+  },
+  "homepage": "https://github.com/calvintwr/blitz-hermite-resize#readme",
+  "devDependencies": {
+    "@babel/core": "^7.10.2",
+    "@babel/preset-env": "^7.10.2",
+    "babelify": "^10.0.0",
+    "browserify": "^16.5.1",
+    "esm": "^3.2.25",
+    "tinyify": "^2.5.2"
+  },
+  "files": [
+    "index.js",
+    "src",
+    "dist"
+  ]
+}
