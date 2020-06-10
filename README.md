@@ -15,7 +15,7 @@ const blitz = Blitz.create()
 
 /* Promise */
 blitz({
-    source: DOM Image/DOM Canvas/jQuery/DataURL/FileReader Event,
+    source: DOM Image/DOM Canvas/jQuery/DataURL/File,
     width: 400,
     height: 600
 }).then(output => {
@@ -50,13 +50,148 @@ blitz({
     // [optional] jpg, gif, png or raw. when not defined, assumes png.
     outputFormat: 'jpg',
 
-    // [optional] `data`, `image` or `canvas`. If not entered output is same as input format.
+    // [optional] `data`, `image`, `file (download)` or `canvas`. If not entered output is same as input format.
     output: 'data',  
 
-    // [optional] applicable for `image` or `data` output only
+    // [optional] applicable for `image`, `file` or `data` output only
     quality: 0.7,
 
     // if you want to know how fast blitz resize       
     logPerformance: true/false
+}).then(output => {
+    // output can:
+
+    // DataURL <String>: You can attach it to <img src> or just redirect to it to show on browser.
+    // Image <Object: Image>: This will be the Image DOM, which you can append to your DOM.
+    // File <Function>: If your ouput is a file, you need to call output() to run the download.
+}).catch(err => {
+    // handle err
 })
+```
+
+## Examples
+```html
+<input type="file" capture="camera" accept="image/*" id="cameraInput" name="cameraInput">
+</script>
+function readFile(file) {
+    var reader = new FileReader();
+    reader.onload = readSuccess;
+
+    function readSuccess(evt) {
+
+        // data to data
+        var b1 = Blitz.create()
+        b1({
+            source: evt.target.result,
+            width: 400,
+            height: 600,
+            outputFormat: 'jpg',
+            output: 'data',
+            quality: 0.7,
+            logPerformance: true
+        }).then(data => {
+            console.log('Resize using event successful')
+            // data is a string you can attach to image src.
+            var image = new Image()
+            image.src = data
+            document.getElementByTag('body').append(image)
+        }).catch(err => {
+            console.log(err)
+        })
+
+        // image -> canvas
+        var img = new Image()
+        img.src = evt.target.result
+        var b2 = Object.create(Blitz)
+        img.onload = function() {
+            b2.resize({
+                source: img,
+                width: 400,
+                height: 600,
+                outputFormat: 'jpg',
+                output: 'canvas',
+                quality: 0.7,
+                logPerformance: true
+            }, function(canvas) {
+                console.log('Resize using img to canvas successful')
+                document.getElementByTag('body').append(canvas)
+            })
+        }
+
+        // data -> image
+        var b3 = Object.create(Blitz)
+        b3.resize({
+            source: evt.target.result,
+            width: 400,
+            height: 600,
+            outputFormat: 'jpg',
+            output: 'image',
+            quality: 0.7,
+            logPerformance: true
+        }, function(image) {
+            console.log('Resize using data successful')
+            // output is just a standard image DOM.
+            // you can append it to your DOM.
+            document.getElementByTag('body').append(image)
+        })
+
+
+        // canvas -> image
+        var img2 = new Image()
+        img2.src = evt.target.result
+        var b4 = Object.create(Blitz)
+
+        img2.onload = function() {
+
+            var canvas = b4._imageToCanvas(img2)
+
+            b4.resize({
+                source: canvas,
+                width: 400,
+                height: 600,
+                outputFormat: 'jpg',
+                output: 'image',
+                quality: 0.7,
+                logPerformance: true
+            }, function(output) {
+                console.log('Resize using canvas successful')
+
+                // output is just a standard image DOM.
+                // you can append it to your DOM.
+                document.getElementByTag('body').append(image)
+            })
+        }
+
+    };
+    reader.readAsDataURL(file);
+}
+
+document.getElementById('cameraInput').onchange = function(e) {
+
+    // file -> file
+    var b5 = Blitz.create()
+
+    b5({
+        source: e.srcElement.files[0],
+        width: 400,
+        height: 600,
+        outputFormat: 'jpg',
+        quality: 0.7,        
+        logPerformance: true
+    }).then(download => {
+        console.log('Resize using file successful')
+        // output is a download function.
+
+        // run some operations
+
+        // then call #download to download the file.
+        download()
+
+    }).catch(err => {
+        console.log(err)
+    })
+
+    readFile(e.srcElement.files[0]);
+};
+</script>
 ```

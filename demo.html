@@ -26,22 +26,21 @@
     </div>
 
     <script>
-
         function readFile(file) {
             var reader = new FileReader();
             reader.onload = readSuccess;
 
             function readSuccess(evt) {
 
-                // file to data
+                // data to data
                 var b1 = Blitz.create()
                 b1({
-                    source: evt,         // any canvas or image elements (jQuery or native), or event from FileReader
+                    source: evt.target.result, // any canvas or image elements (jQuery or native), or File from FileReader
                     width: 400,
                     height: 600,
                     outputFormat: 'jpg', // [optional] jpg, gif, png or raw. when not defined, assumes png.
-                    output: 'data',      // [optional] `image` or `canvas`. If not entered output is same as input element.
-                    quality: 0.7,        // [optional] applicable for `image` or `data` output only
+                    output: 'data',      // [optional] ``data`, `image`, `file (download)` or `canvas`. If not entered output is same as input element.
+                    quality: 0.7,        // [optional] applicable for `image`, `file` or `data` output only
                     logPerformance: true
                 }).then(output => {
                     console.log('Resize using event successful')
@@ -56,12 +55,12 @@
                 var b2 = Object.create(Blitz)
                 img.onload = function() {
                     b2.resize({
-                        source: img,         // any canvas or image elements (jQuery or native), or event from FileReader
+                        source: img,
                         width: 400,
                         height: 600,
-                        outputFormat: 'jpg', // [optional] jpg, gif, png or raw. when not defined, assumes png.
-                        output: 'canvas',      // [optional] `image` or `canvas`. If not entered output is same as input element.
-                        quality: 0.7,        // [optional] applicable for `image` or `data` output only
+                        outputFormat: 'jpg',
+                        output: 'canvas',
+                        quality: 0.7,
                         logPerformance: true
                     }, function(output) {
                         console.log('Resize using img to canvas successful')
@@ -72,12 +71,12 @@
                 // data -> image
                 var b3 = Object.create(Blitz)
                 b3.resize({
-                    source: evt.target.result,         // any canvas or image elements (jQuery or native), or event from FileReader
+                    source: evt.target.result,
                     width: 400,
                     height: 600,
-                    outputFormat: 'jpg', // [optional] jpg, gif, png or raw. when not defined, assumes png.
-                    output: 'image',      // [optional] `image` or `canvas`. If not entered output is same as input element.
-                    quality: 0.7,        // [optional] applicable for `image` or `data` output only
+                    outputFormat: 'jpg',
+                    output: 'image',
+                    quality: 0.7,
                     logPerformance: true
                 }, function(output) {
                     console.log('Resize using data successful')
@@ -95,12 +94,12 @@
                     var canvas = b4._imageToCanvas(img2)
 
                     b4.resize({
-                        source: canvas,         // any canvas or image elements (jQuery or native), or event from FileReader
+                        source: canvas,
                         width: 400,
                         height: 600,
-                        outputFormat: 'jpg', // [optional] jpg, gif, png or raw. when not defined, assumes png.
-                        output: 'image',      // [optional] `image` or `canvas`. If not entered output is same as input element.
-                        quality: 0.7,        // [optional] applicable for `image` or `data` output only
+                        outputFormat: 'jpg',
+                        output: 'image',
+                        quality: 0.7,
                         logPerformance: true
                     }, function(output) {
                         console.log('Resize using canvas successful')
@@ -108,12 +107,29 @@
                     })
                 }
 
-
             };
             reader.readAsDataURL(file);
         }
 
         document.getElementById('cameraInput').onchange = function(e) {
+
+            // file -> file
+            var b5 = Blitz.create()
+
+            b5({
+                source: e.srcElement.files[0],
+                height: 600,
+                width: 400,
+                outputFormat: 'jpg',
+                quality: 0.7,
+                logPerformance: true
+            }).then(download => {
+                console.log('Resize using file successful')
+                download()
+            }).catch(err => {
+                console.log(err)
+            })
+
             readFile(e.srcElement.files[0]);
         };
     </script>

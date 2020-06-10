@@ -35,11 +35,12 @@ var Blitz = {
     if (sourceElement.type === 'CANVAS') {
       canvas = sourceElement.source;
     } else if (sourceElement.type === 'IMG') {
-      console.log('source type IMG');
       canvas = this._imageToCanvas(sourceElement.source);
     } else if (sourceElement.type === 'DATA') {
-      console.log('source type DATA');
       if (!obj.output) obj.output = 'data';
+      return this._dataToCanvas(sourceElement.source, obj, callback);
+    } else if (sourceElement.type === 'FILE') {
+      if (!obj.output) obj.output = 'file';
       return this._fileToCanvas(sourceElement.source, obj, callback);
     }
 
@@ -56,7 +57,6 @@ var Blitz = {
     var worker = new Worker(this._workerBlobURL(obj.filter)); // obj.filter allows other filter algo to be use in future
 
     worker.onmessage = function (event) {
-      console.log('worker done');
       var resizedImage = event.data.data;
       if (obj.logPerformance) console.log('Resize completed in ' + Math.round(Date.now() - startTime) / 1000 + 's');
       canvas.getContext('2d').clearRect(0, 0, resizeToWidth, resizeToHeight);
@@ -68,11 +68,13 @@ var Blitz = {
         return callback(canvas);
       } else if (['image', 'data'].indexOf(obj.output) > -1) {
         self._canvasToImageOrData(canvas, obj.mimeType, obj.quality, obj.output, callback);
+      } else if (obj.output === 'file') {
+        return callback(self._download(self, canvas, obj));
       } else if (typeof obj.output === 'undefined') {
         // when not defined, assume whatever element type is the input, is the desired output
         var outputFormat;
 
-        if (sourceElement.type === 'FILE') {
+        if (sourceElement.type === 'DATA') {
           outputFormat = 'data';
         } else if (sourceElement.type === 'IMG') {
           outputFormat = 'image';
@@ -116,11 +118,11 @@ var Blitz = {
     }
   },
   _extract: function _extract(source) {
-    if (source instanceof ProgressEvent) {
-      // FileReader event
+    if (source instanceof File) {
+      // File
       return {
-        source: source.target.result,
-        type: 'DATA'
+        source: source,
+        type: 'FILE'
       };
     } else if (typeof source === 'string' && source.indexOf('data') === 0) {
       // dataBlob
@@ -152,17 +154,14 @@ var Blitz = {
     context.drawImage(image, 0, 0, image.width, image.height);
     return c;
   },
-  _fileToCanvas: function _fileToCanvas(file, obj, callback) {
+  _dataToCanvas: function _dataToCanvas(data, obj, callback) {
     // create an off-screen image
     var image = new Image();
     var self = this;
-    image.src = file;
+    image.src = data;
 
     image.onload = function () {
-      console.log(image);
-      console.log(image.height);
-      console.log(image.width); // create an off-screen canvas
-
+      // create an off-screen canvas
       var c = document.createElement('canvas');
       var context = c.getContext('2d');
       c.height = image.height;
@@ -173,6 +172,19 @@ var Blitz = {
       self.resize(obj, callback);
     };
   },
+  _fileToCanvas: function _fileToCanvas(file, obj, callback) {
+    var self = this;
+    var reader = new FileReader();
+    reader.onload = readSuccess;
+
+    function readSuccess(event) {
+      obj.source = event.target.result;
+      if (!obj.output) obj.output = 'file';
+      self.resize(obj, callback);
+    }
+
+    reader.readAsDataURL(file);
+  },
   _canvasToImageOrData: function _canvasToImageOrData(canvas, mimeType, quality, output, callback) {
     var data = canvas.toDataURL(mimeType, quality);
     var image;
@@ -180,7 +192,6 @@ var Blitz = {
     if (output === 'data') {
       image = data;
     } else {
-      console.log(890389);
       var image = new Image();
       image.src = canvas.toDataURL(mimeType, quality);
     }
@@ -198,6 +209,16 @@ var Blitz = {
     if (index === 2) return 'image/jpg';
     if (index === 3) return 'image/gif';
     return format;
+  },
+  _download: function _download(self, canvas, obj) {
+    return function () {
+      var link = document.createElement('a');
+      link.href = self._canvasToImageOrData(canvas, obj.mimeType, obj.quality, 'data');
+      link.download = 'resized';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
   },
   _workerBlobURL: function _workerBlobURL(filter) {
     if (filter) filter = this['_filter_' + filter];
