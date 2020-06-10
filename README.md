@@ -43,14 +43,15 @@ Precipitously cut image upload time and server loads by doing client-side image 
 ## Full options
 ```js
 blitz({
-    source: DOM Image/DOM Canvas/jQuery/DataURL/FileReader Event,
+    source: DOM Image/DOM Canvas/jQuery/DataURL/Javscript #File,
     width: 400,
     height: 600,
 
     // [optional] jpg, gif, png or raw. when not defined, assumes png.
     outputFormat: 'jpg',
 
-    // [optional] `data`, `image`, `file (download)` or `canvas`. If not entered output is same as input format.
+    // [optional] `image`, `canvas`, `data`, `download`, `blob`, or `flie` for Javascript #File.
+    // If not entered output is same as input format.
     output: 'data',  
 
     // [optional] applicable for `image`, `file` or `data` output only
@@ -59,11 +60,16 @@ blitz({
     // if you want to know how fast blitz resize       
     logPerformance: true/false
 }).then(output => {
-    // output can:
+    // outputs:
 
-    // DataURL <String>: You can attach it to <img src> or just redirect to it to show on browser.
-    // Image <Object: Image>: This will be the Image DOM, which you can append to your DOM.
-    // File <Function>: If your ouput is a file, you need to call output() to run the download.
+    // 'image' -- Image <Object: Image>: This will be the Image DOM, which you can append to your DOM.
+    // 'canvas' -- HTML Canvas
+    // 'data' -- DataURL <String>: You can attach it to <img src> or just redirect to it to show on browser.
+    // 'download' -- <Function>: You need to call this function to run the download.
+    // 'blob' -- Blob <Function>: Javascript Blob object
+    // 'file' -- File <Object>: Javascript File object
+
+
 }).catch(err => {
     // handle err
 })

@@ -29,7 +29,7 @@ var Blitz = {
 
     var mimeType = this._mimeConverter(obj.outputFormat);
 
-    obj.outputFormat = mimeType;
+    obj.outputFormat = obj.mimeType = mimeType;
     var canvas;
 
     if (sourceElement.type === 'CANVAS') {
@@ -63,13 +63,18 @@ var Blitz = {
       canvas.height = resizeToHeight;
       canvas.width = resizeToWidth;
       canvas.getContext('2d').putImageData(resizedImage, 0, 0);
+      var output;
 
       if (obj.output === 'canvas') {
-        return callback(canvas);
+        output = canvas;
       } else if (['image', 'data'].indexOf(obj.output) > -1) {
-        self._canvasToImageOrData(canvas, obj.mimeType, obj.quality, obj.output, callback);
+        output = self._canvasToImageOrData(canvas, obj.mimeType, obj.quality, obj.output);
       } else if (obj.output === 'file') {
-        return callback(self._download(self, canvas, obj));
+        output = self._canvasToFile(canvas, obj.mimeType, obj.quality, obj.output);
+      } else if (obj.output === 'blob') {
+        output = self._canvasToBlob(canvas, obj.mimeType, obj.quality, obj.output);
+      } else if (obj.output === 'download') {
+        output = self._download(self, canvas, obj);
       } else if (typeof obj.output === 'undefined') {
         // when not defined, assume whatever element type is the input, is the desired output
         var outputFormat;
@@ -81,14 +86,16 @@ var Blitz = {
         }
 
         if (outputFormat) {
-          return self._canvasToImageOrData(canvas, obj.mimeType, obj.quality, outputFormat, callback);
-        } // else can only be canvas
-
-
-        return callback(canvas);
+          return output = self._canvasToImageOrData(canvas, obj.mimeType, obj.quality, outputFormat);
+        } else {
+          // else can only be canvas
+          output = canvas;
+        }
       } else {
         throw Error('`output` is not valid.');
       }
+
+      callback(output);
     };
 
     worker.postMessage([original, originalWidth, originalHeight, resizeToWidth, resizeToHeight, resizedImage]);
@@ -185,7 +192,7 @@ var Blitz = {
 
     reader.readAsDataURL(file);
   },
-  _canvasToImageOrData: function _canvasToImageOrData(canvas, mimeType, quality, output, callback) {
+  _canvasToImageOrData: function _canvasToImageOrData(canvas, mimeType, quality, output) {
     var data = canvas.toDataURL(mimeType, quality);
     var image;
 
@@ -196,8 +203,48 @@ var Blitz = {
       image.src = canvas.toDataURL(mimeType, quality);
     }
 
-    if (typeof callback === 'function') return callback(image);
     return image;
+  },
+  _canvasToBlob: function _canvasToBlob(canvas, mimeType, quality, output) {
+    // safari does not support canvas #toBlob, so need to convert from dataURI
+    var data = this._canvasToImageOrData(canvas, mimeType, quality, 'data');
+
+    var blob = this._dataURItoBlob(data);
+
+    return blob;
+  },
+  _canvasToFile: function _canvasToFile(canvas, mimeType, quality, output) {
+    console.log(mimeType);
+
+    var blob = this._canvasToBlob(canvas, mimeType, quality);
+
+    return new File([blob], 'resized', {
+      type: mimeType,
+      lastModified: Date.now()
+    });
+  },
+  _dataURItoBlob: function _dataURItoBlob(dataURI) {
+    // convert base64/URLEncoded data component to raw binary data held in a string
+    var byteString;
+
+    if (dataURI.split(',')[0].indexOf('base64') >= 0) {
+      byteString = atob(dataURI.split(',')[1]);
+    } else {
+      byteString = unescape(dataURI.split(',')[1]);
+    } // separate out the mime component
+
+
+    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]; // write the bytes of the string to a typed array
+
+    var ia = new Uint8Array(byteString.length);
+
+    for (var i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+
+    return new Blob([ia], {
+      type: mimeString
+    });
   },
   _mimeConverter: function _mimeConverter(format) {
     // if undefined, assume no compression.

@@ -1,6 +1,6 @@
 {
   "name": "blitz-resize",
-  "version": "0.3.2",
+  "version": "0.3.4",
   "description": "Fast, non-blocking, promise-styled client-side image resize/resample using Hermite filter with JavaScript.",
   "main": "index.js",
   "browser": "dist/blitz.min.js",

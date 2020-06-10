@@ -123,9 +123,43 @@
                 outputFormat: 'jpg',
                 quality: 0.7,
                 logPerformance: true
+            }).then(file => {
+                console.log('Resize using file->file successful')
+                console.log('File object:')
+                console.log(file instanceof File)
+                console.log(file)
+            }).catch(err => {
+                console.log(err)
+            })
+
+            // file -> download
+            b5({
+                source: e.srcElement.files[0],
+                height: 600,
+                width: 400,
+                outputFormat: 'jpg',
+                output: 'download',
+                quality: 0.7,
+                logPerformance: true
             }).then(download => {
-                console.log('Resize using file successful')
+                console.log('Resize using file->download successful')
                 download()
+            }).catch(err => {
+                console.log(err)
+            })
+
+            // file -> blob
+            b5({
+                source: e.srcElement.files[0],
+                height: 600,
+                width: 400,
+                outputFormat: 'jpg',
+                output: 'blob',
+                quality: 0.7,
+                logPerformance: true
+            }).then(blob => {
+                console.log('Resize using file->blob successful')
+                console.log(blob)
             }).catch(err => {
                 console.log(err)
             })
