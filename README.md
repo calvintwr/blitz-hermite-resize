@@ -108,6 +108,8 @@ function readFile(file) {
         // image -> canvas
         var img = new Image()
         img.src = evt.target.result
+        
+        // using #Object.create and then the #resize method is similar to Blitz.create('callback')
         var b2 = Object.create(Blitz)
         img.onload = function() {
             b2.resize({
