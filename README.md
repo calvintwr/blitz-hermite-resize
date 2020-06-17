@@ -20,7 +20,7 @@ blitz({
     height: 600
 }).then(output => {
     // handle output
-})catch(error => {
+}).catch(error => {
     // handle error
 })
 
