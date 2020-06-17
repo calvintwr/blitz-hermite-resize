@@ -78,7 +78,7 @@ blitz({
 ## Examples
 ```html
 <input type="file" capture="camera" accept="image/*" id="cameraInput" name="cameraInput">
-</script>
+<script>
 function readFile(file) {
     var reader = new FileReader();
     reader.onload = readSuccess;
