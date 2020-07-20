@@ -1,7 +1,8 @@
-# Blitz
+![Black with Thunder Icon Basketball Logo-2](https://user-images.githubusercontent.com/6825277/87935398-9fffdb00-cac3-11ea-9daf-0139489853f9.png)
 
 Fast, non-blocking, promise-styled client-side image resize/resample using Hermite filter with JavaScript.
 
+# Blitz
 ## Installation
 
 ```
