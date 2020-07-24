@@ -1,7 +1,8 @@
-# Blitz
+![Black with Thunder Icon Basketball Logo-2](https://user-images.githubusercontent.com/6825277/87935398-9fffdb00-cac3-11ea-9daf-0139489853f9.png)
 
 Fast, non-blocking, promise-styled client-side image resize/resample using Hermite filter with JavaScript.
 
+# Blitz
 ## Installation
 
 ```
@@ -20,7 +21,7 @@ blitz({
     height: 600
 }).then(output => {
     // handle output
-})catch(error => {
+}).catch(error => {
     // handle error
 })
 
@@ -78,7 +79,7 @@ blitz({
 ## Examples
 ```html
 <input type="file" capture="camera" accept="image/*" id="cameraInput" name="cameraInput">
-</script>
+<script>
 function readFile(file) {
     var reader = new FileReader();
     reader.onload = readSuccess;
@@ -108,6 +109,8 @@ function readFile(file) {
         // image -> canvas
         var img = new Image()
         img.src = evt.target.result
+        
+        // using #Object.create and then the #resize method is similar to Blitz.create('callback')
         var b2 = Object.create(Blitz)
         img.onload = function() {
             b2.resize({
