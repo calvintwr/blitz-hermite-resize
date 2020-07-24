@@ -57,7 +57,7 @@ var Blitz = {
     var worker = new Worker(this._workerBlobURL(obj.filter)); // obj.filter allows other filter algo to be use in future
 
     worker.onmessage = function (event) {
-      var resizedImage = event.data.data;
+      var resizedImage = new ImageData(new Uint8ClampedArray(event.data.data), resizeToWidth, resizeToHeight);
       if (obj.logPerformance) console.log('Resize completed in ' + Math.round(Date.now() - startTime) / 1000 + 's');
       canvas.getContext('2d').clearRect(0, 0, resizeToWidth, resizeToHeight);
       canvas.height = resizeToHeight;
@@ -98,7 +98,7 @@ var Blitz = {
       callback(output);
     };
 
-    worker.postMessage([original, originalWidth, originalHeight, resizeToWidth, resizeToHeight, resizedImage]);
+    worker.postMessage([original.data.buffer, originalWidth, originalHeight, resizeToWidth, resizeToHeight, resizedImage.data.buffer], [original.data.buffer, resizedImage.data.buffer]);
   },
   create: function create(kind) {
     if (!kind || kind === 'promise') {
@@ -214,8 +214,6 @@ var Blitz = {
     return blob;
   },
   _canvasToFile: function _canvasToFile(canvas, mimeType, quality, output) {
-    console.log(mimeType);
-
     var blob = this._canvasToBlob(canvas, mimeType, quality);
 
     return new File([blob], 'resized', {
@@ -285,71 +283,97 @@ var Blitz = {
     task += '        var filter = ';
     task += filter.toString();
     task += '        ;var resized = filter(event)';
-    task += '        ;postMessage({data: resized });';
+    task += '        ;postMessage({data: resized }, [ resized ]);';
     task += '    };';
     task += '}';
     task += ')()';
     return task;
   },
-  _filter_hermite: function _filter_hermite(event) {
-    var img = event.data[0];
-    var data = img.data;
-    var W = event.data[1];
-    var H = event.data[2];
-    var W2 = event.data[3];
-    var H2 = event.data[4];
-    var img2 = event.data[5];
-    var data2 = img2.data;
-    var ratio_w = W / W2;
-    var ratio_h = H / H2;
-    var ratio_w_half = Math.ceil(ratio_w / 2);
-    var ratio_h_half = Math.ceil(ratio_h / 2);
+  addFilter: function addFilter(filter) {
+    var name = "_filter_".concat(filter.name);
+    if (this[name]) throw Error("Filter name already exist for ".concat(filter.name, ". Please use another name."));
+    this[name] = filter.filter;
+    return this;
+  }
+};
+module.exports = Blitz;
+exports = module.exports;
 
-    for (var j = 0; j < H2; j++) {
-      for (var i = 0; i < W2; i++) {
-        var x2 = (i + j * W2) * 4;
-        var weight = 0;
-        var weights = 0;
-        var gx_r = gx_g = gx_b = gx_a = 0;
-        var center_y = (j + 0.5) * ratio_h;
+},{}],2:[function(require,module,exports){
+'use strict';
 
-        for (var yy = Math.floor(j * ratio_h); yy < (j + 1) * ratio_h; yy++) {
-          var dy = Math.abs(center_y - (yy + 0.5)) / ratio_h_half;
-          var center_x = (i + 0.5) * ratio_w;
-          var w0 = dy * dy; //pre-calc part of w
+var name = 'hermite';
 
-          for (var xx = Math.floor(i * ratio_w); xx < (i + 1) * ratio_w; xx++) {
-            var dx = Math.abs(center_x - (xx + 0.5)) / ratio_w_half;
-            var w = Math.sqrt(w0 + dx * dx);
+var filter = function filter(event) {
+  var data = new Uint8ClampedArray(event.data[0]);
+  var W = event.data[1];
+  var H = event.data[2];
+  var img = new ImageData(data, W, H);
+  var data2 = new Uint8ClampedArray(event.data[5]);
+  var W2 = event.data[3];
+  var H2 = event.data[4];
+  var img2 = new ImageData(data2, W2, H2);
+  var ratio_w = W / W2;
+  var ratio_h = H / H2;
+  var ratio_w_half = Math.ceil(ratio_w / 2);
+  var ratio_h_half = Math.ceil(ratio_h / 2);
 
-            if (w >= -1 && w <= 1) {
-              //hermite filter
-              weight = 2 * w * w * w - 3 * w * w + 1;
+  for (var j = 0; j < H2; j++) {
+    for (var i = 0; i < W2; i++) {
+      var x2 = (i + j * W2) * 4;
+      var weight = 0;
+      var weights = 0;
+      var gx_r = gx_g = gx_b = gx_a = 0;
+      var center_y = (j + 0.5) * ratio_h;
 
-              if (weight > 0) {
-                dx = 4 * (xx + yy * W);
-                gx_r += weight * data[dx];
-                gx_g += weight * data[dx + 1];
-                gx_b += weight * data[dx + 2];
-                gx_a += weight * data[dx + 3];
-                weights += weight;
-              }
+      for (var yy = Math.floor(j * ratio_h); yy < (j + 1) * ratio_h; yy++) {
+        var dy = Math.abs(center_y - (yy + 0.5)) / ratio_h_half;
+        var center_x = (i + 0.5) * ratio_w;
+        var w0 = dy * dy; //pre-calc part of w
+
+        for (var xx = Math.floor(i * ratio_w); xx < (i + 1) * ratio_w; xx++) {
+          var dx = Math.abs(center_x - (xx + 0.5)) / ratio_w_half;
+          var w = Math.sqrt(w0 + dx * dx);
+
+          if (w >= -1 && w <= 1) {
+            //hermite filter
+            weight = 2 * w * w * w - 3 * w * w + 1;
+
+            if (weight > 0) {
+              dx = 4 * (xx + yy * W);
+              gx_r += weight * data[dx];
+              gx_g += weight * data[dx + 1];
+              gx_b += weight * data[dx + 2];
+              gx_a += weight * data[dx + 3];
+              weights += weight;
             }
           }
         }
-
-        data2[x2] = gx_r / weights;
-        data2[x2 + 1] = gx_g / weights;
-        data2[x2 + 2] = gx_b / weights;
-        data2[x2 + 3] = gx_a / weights;
       }
-    }
 
-    return img2;
+      data2[x2] = gx_r / weights;
+      data2[x2 + 1] = gx_g / weights;
+      data2[x2 + 2] = gx_b / weights;
+      data2[x2 + 3] = gx_a / weights;
+    }
   }
+
+  return img2.data.buffer;
 };
+
+module.exports = {
+  name: name,
+  filter: filter
+};
+
+},{}],3:[function(require,module,exports){
+'use strict';
+
+var Blitz = require('./blitz.js');
+
+Blitz.addFilter(require('./filters/hermite.js'));
 module.exports = Object.create(Blitz);
 exports = module.exports;
 
-},{}]},{},[1])(1)
+},{"./blitz.js":1,"./filters/hermite.js":2}]},{},[3])(3)
 });

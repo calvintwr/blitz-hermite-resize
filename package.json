@@ -6,8 +6,8 @@
   "browser": "dist/blitz.min.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "browserify": "browserify src/blitz.js > dist/blitz.js --standalone Blitz --global-transform [ babelify --configFile ./.dist.babelrc ]",
-    "browserify:minify": "browserify src/blitz.js > dist/blitz.min.js --standalone Blitz --global-transform [ babelify --configFile ./.dist.babelrc ] -p tinyify",
+    "browserify": "browserify src/index.js > dist/blitz.js --standalone Blitz --global-transform [ babelify --configFile ./.dist.babelrc ]",
+    "browserify:minify": "browserify src/index.js > dist/blitz.min.js --standalone Blitz --global-transform [ babelify --configFile ./.dist.babelrc ] -p tinyify",
     "build": "npm run browserify && npm run browserify:minify"
   },
   "repository": {
