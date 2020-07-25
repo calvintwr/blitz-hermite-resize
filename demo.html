@@ -10,7 +10,7 @@
     <h1>File input test</h1>
     <div>
         <p>File to Data: </p>
-        <textarea style="height: 400px; width: 400px;" id="dataOutput"></textarea>
+        <textarea style="height: 400px; width: 640px;" id="dataOutput"></textarea>
     </div>
     <div>
         <p>Image to Canvas:</p>
@@ -30,50 +30,49 @@
             var reader = new FileReader();
             reader.onload = readSuccess;
 
-            function readSuccess(evt) {
+            async function readSuccess(evt) {
 
-                // data to data
+                // data to data (async/await style)
                 var b1 = Blitz.create()
-                b1({
-                    source: evt.target.result, // any canvas or image elements (jQuery or native), or File from FileReader
-                    width: 400,
-                    height: 600,
-                    outputFormat: 'jpg', // [optional] jpg, gif, png or raw. when not defined, assumes png.
-                    output: 'data',      // [optional] ``data`, `image`, `file (download)` or `canvas`. If not entered output is same as input element.
-                    quality: 0.7,        // [optional] applicable for `image`, `file` or `data` output only
-                    logPerformance: true
-                }).then(output => {
+                
+                try {
+                    let output = await b1({
+                        source: evt.target.result, // any canvas or image elements (jQuery or native), or File from FileReader
+                        width: 640,
+                        outputFormat: 'jpg', // [optional] jpg, gif, png or raw. when not defined, assumes png.
+                        output: 'data',      // [optional] ``data`, `image`, `file (download)` or `canvas`. If not entered output is same as input element.
+                        quality: 0.7,        // [optional] applicable for `image`, `file` or `data` output only
+                        logPerformance: true
+                    })
                     console.log('Resize using event successful')
                     document.getElementById("dataOutput").innerHTML = output
-                }).catch(err => {
+                } catch(err) {
                     console.log(err)
-                })
+                }
 
-                // image -> canvas
+                // image -> canvas (promise style)
                 var img = new Image()
                 img.src = evt.target.result
-                var b2 = Object.create(Blitz)
+                var b2 = Blitz.create()
                 img.onload = function() {
-                    b2.resize({
+                    b2({
                         source: img,
-                        width: 400,
-                        height: 600,
+                        width: 640,
                         outputFormat: 'jpg',
                         output: 'canvas',
                         quality: 0.7,
                         logPerformance: true
-                    }, function(output) {
+                    }).then(output => {
                         console.log('Resize using img to canvas successful')
                         document.getElementById("canvasOutput").append(output)
                     })
                 }
 
-                // data -> image
+                // data -> image (callback style)
                 var b3 = Object.create(Blitz)
                 b3.resize({
                     source: evt.target.result,
-                    width: 400,
-                    height: 600,
+                    width: 640,
                     outputFormat: 'jpg',
                     output: 'image',
                     quality: 0.7,
@@ -95,8 +94,7 @@
 
                     b4.resize({
                         source: canvas,
-                        width: 400,
-                        height: 600,
+                        width: 640,
                         outputFormat: 'jpg',
                         output: 'image',
                         quality: 0.7,
@@ -118,8 +116,7 @@
 
             b5({
                 source: e.srcElement.files[0],
-                height: 600,
-                width: 400,
+                width: 640,
                 outputFormat: 'jpg',
                 quality: 0.7,
                 logPerformance: true
@@ -135,9 +132,8 @@
             // file -> download
             b5({
                 source: e.srcElement.files[0],
-                height: 600,
-                width: 400,
-                outputFormat: 'jpg',
+                width: 640,
+                outputFormat: 'png',
                 output: 'download',
                 quality: 0.7,
                 logPerformance: true
@@ -148,11 +144,10 @@
                 console.log(err)
             })
 
-            // file -> blob
+            //file -> blob
             b5({
                 source: e.srcElement.files[0],
-                height: 600,
-                width: 400,
+                width: 640,
                 outputFormat: 'jpg',
                 output: 'blob',
                 quality: 0.7,

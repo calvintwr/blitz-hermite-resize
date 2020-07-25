@@ -1,11 +1,11 @@
 {
   "name": "blitz-resize",
-  "version": "0.3.5",
-  "description": "Fast, non-blocking, promise-styled client-side image resize/resample using Hermite filter with JavaScript.",
+  "version": "0.4.0",
+  "description": "Most versatile, powerful, and fastest way to resize an image. Fast, non-blocking (does not freeze windows), and async/await/promise compatible.",
   "main": "index.js",
   "browser": "dist/blitz.min.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha './tests/' --recursive --exit -r esm",
     "browserify": "browserify src/index.js > dist/blitz.js --standalone Blitz --global-transform [ babelify --configFile ./.dist.babelrc ]",
     "browserify:minify": "browserify src/index.js > dist/blitz.min.js --standalone Blitz --global-transform [ babelify --configFile ./.dist.babelrc ] -p tinyify",
     "build": "npm run browserify && npm run browserify:minify"
@@ -33,7 +33,12 @@
     "@babel/preset-env": "^7.10.2",
     "babelify": "^10.0.0",
     "browserify": "^16.5.1",
+    "chai": "^4.2.0",
     "esm": "^3.2.25",
+    "mocha": "^8.0.1",
+    "mocha-sinon": "^2.1.2",
+    "sinon": "^9.0.2",
+    "sinon-chai": "^3.5.0",
     "tinyify": "^2.5.2"
   },
   "files": [
