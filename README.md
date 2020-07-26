@@ -29,7 +29,7 @@ blitz({
 })
 
 /* Await */
-let resized = await blizt({...})
+let resized = await blitz({...})
 
 /* Old school callback */
 const blitz = Blitz.create('callback')
