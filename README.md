@@ -1,9 +1,9 @@
 ## This is a complete re-write of viliusle's hermite resize.
 ![Black with Thunder Icon Basketball Logo-2](https://user-images.githubusercontent.com/6825277/87935398-9fffdb00-cac3-11ea-9daf-0139489853f9.png)
 
-**Blitz is the most versatile, powerful, and fastest way to resize an image. It is fast, non-blocking (does not freeze windows), and async/await/promise compatible.**
+**Blitz is the fastest, most versatile, and powerful way to resize an image. It is fast, non-blocking (does not freeze browser UI), and async/await/promise compatible.**
 
-**Blitz resizes high resolution DSLR images in a matter of seconds. Precipitously cut upload time by resizing your image on the client-side, yet achieve high quality and performace using Hermite filter.**
+**Blitz resizes high resolution DSLR images in a matter of seconds. Precipitously cut upload time by resizing your image on the client-side, yet achieve high quality and performance.**
 
 # Blitz
 ## Installation
