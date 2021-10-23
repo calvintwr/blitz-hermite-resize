@@ -1,7 +1,6 @@
 //name: Blitz Image Resizer
 //about: Fast, non-blocking client-side image resize/resample using Hermite filter with JavaScript.
-//author: ViliusL
-//forkedby: calvintwr
+//author: calvintwr
 var Blitz = {
     resize: function(opts, callback) {
 
