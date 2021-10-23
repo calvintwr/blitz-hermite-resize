@@ -1,4 +1,3 @@
-## This is a complete re-write of viliusle's hermite resize.
 ![Black with Thunder Icon Basketball Logo-2](https://user-images.githubusercontent.com/6825277/87935398-9fffdb00-cac3-11ea-9daf-0139489853f9.png)
 
 **Blitz is the fastest, most versatile, and powerful way to resize an image. It is designed to be non-blocking (does not freeze browser UI), and async/await/promise compatible.**
